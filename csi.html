@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEA201 - Master Tool (Updated UI)</title>
+    <title>CEA201 - Master Tool (Pro UI)</title>
     <style>
         :root {
             --primary-color: #6f42c1;
@@ -73,7 +73,7 @@
         .nav-btn.secondary:hover { background: #dee2e6; }
         .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* --- Question Card Styling --- */
+        /* --- Question Card Styling (Quiz Mode) --- */
         .question-card { background: white; border-radius: 20px; padding: 30px; box-shadow: var(--card-shadow); margin-bottom: 20px; position: relative; }
         .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 25px; font-weight: 500; }
         
@@ -84,53 +84,30 @@
         }
         .options-list li:hover:not(.disabled) { border-color: var(--primary-color); background: #fcfaff; }
         
-        /* Label A, B, C */
         .options-list li::before {
             content: attr(data-label); position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
             width: 28px; height: 28px; background: #e9ecef; color: #495057; border-radius: 8px;
             text-align: center; line-height: 28px; font-weight: 700; font-size: 13px; transition: all 0.2s;
         }
 
-        /* --- STATES: SELECTED --- */
         .options-list li.selected {
-            border-color: var(--primary-color);
-            background-color: var(--primary-light);
-            box-shadow: 0 0 0 1px var(--primary-color) inset;
-            font-weight: 600;
+            border-color: var(--primary-color); background-color: var(--primary-light);
+            box-shadow: 0 0 0 1px var(--primary-color) inset; font-weight: 600;
         }
-        .options-list li.selected::before {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        .options-list li.selected::before { background-color: var(--primary-color); color: white; }
 
-        /* --- STATES: CHECKED --- */
         .options-list.checked li { cursor: default; opacity: 0.6; }
-        
-        /* Đúng */
         .options-list.checked li.is-correct-answer {
-            background-color: #d1e7dd !important;
-            border-color: #0f5132 !important;
-            color: #0f5132 !important;
-            opacity: 1 !important;
+            background-color: #d1e7dd !important; border-color: #0f5132 !important; color: #0f5132 !important; opacity: 1 !important;
             box-shadow: 0 0 0 1px #0f5132 inset;
         }
-        .options-list.checked li.is-correct-answer::before {
-            background-color: #198754; color: white; content: "✔";
-        }
-
-        /* Sai (User chọn sai) */
+        .options-list.checked li.is-correct-answer::before { background-color: #198754; color: white; content: "✔"; }
         .options-list.checked li.is-wrong-answer {
-            background-color: #f8d7da !important;
-            border-color: #842029 !important;
-            color: #842029 !important;
-            opacity: 1 !important;
+            background-color: #f8d7da !important; border-color: #842029 !important; color: #842029 !important; opacity: 1 !important;
             box-shadow: 0 0 0 1px #842029 inset;
         }
-        .options-list.checked li.is-wrong-answer::before {
-            background-color: #dc3545; color: white; content: "✘";
-        }
+        .options-list.checked li.is-wrong-answer::before { background-color: #dc3545; color: white; content: "✘"; }
 
-        /* Giải thích */
         .instant-explanation {
             margin-top: 20px; padding: 15px; border-radius: 12px;
             background-color: #e2e3e5; color: #41464b; font-size: 15px;
@@ -140,7 +117,6 @@
         .instant-explanation.correct { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
         .instant-explanation.wrong { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
 
-        /* Nút Check Đặc Biệt */
         .btn-check-wrapper { text-align: center; margin-top: 20px; }
         .btn-check-multi {
             background-color: var(--warning-color); color: white; border: none;
@@ -149,11 +125,9 @@
             display: inline-flex; align-items: center; gap: 8px;
         }
         .btn-check-multi:hover:not(:disabled) { background-color: #e36d0a; transform: translateY(-2px); }
-        .btn-check-multi:disabled {
-            background-color: #ced4da; color: #6c757d; cursor: not-allowed; box-shadow: none; transform: none;
-        }
+        .btn-check-multi:disabled { background-color: #ced4da; color: #6c757d; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* --- FLASHCARD STYLING (UPDATED) --- */
+        /* --- FLASHCARD STYLING (UPDATED V2) --- */
         .flashcard-wrapper { display: flex; justify-content: center; perspective: 1000px; margin-bottom: 30px; }
         .flashcard {
             width: 100%; max-width: 700px; position: relative; transform-style: preserve-3d;
@@ -162,7 +136,7 @@
         .flashcard.flipped { transform: rotateY(180deg); }
         
         .card-face {
-            grid-area: 1 / 1; width: 100%; min-height: 450px; /* Tăng chiều cao xíu cho đẹp */
+            grid-area: 1 / 1; width: 100%; min-height: 450px;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
             border-radius: 24px;
             box-shadow: var(--card-shadow); 
@@ -171,59 +145,41 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
         
+        /* --- CARD FRONT (HIGHLIGHTED) --- */
         .card-front { 
-            background: white; 
             z-index: 2; 
-            transform: rotateY(0deg); 
+            transform: rotateY(0deg);
+            /* Highlight nhẹ: Gradient từ trắng sang tím rất nhạt */
+            background: linear-gradient(to bottom, #ffffff, #f5f2ff);
+            /* Viền trên để tạo điểm nhấn */
+            border-top: 6px solid var(--primary-color);
         }
 
-        /* --- UPDATED CARD BACK (EYE CATCHING) --- */
+        /* --- CARD BACK (EYE CATCHING) --- */
         .card-back { 
             transform: rotateY(180deg); 
-            /* Gradient nền bắt mắt (Tím nhạt -> Xanh nhạt) */
             background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
             border: none;
-            justify-content: center; /* Căn giữa nội dung */
+            justify-content: center;
         }
 
-        /* Style cho phần Đáp án chính bên trong Card Back */
         #fc-answer {
-            font-size: 22px; 
-            font-weight: 800; 
-            margin-bottom: 25px; 
-            color: #2c3e50;
-            width: 100%;
-            /* Hiệu ứng kính mờ */
-            background: rgba(255, 255, 255, 0.85);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border: 2px solid rgba(255,255,255,0.8);
-            text-align: center;
+            font-size: 22px; font-weight: 800; margin-bottom: 25px; color: #2c3e50; width: 100%;
+            background: rgba(255, 255, 255, 0.85); padding: 20px; border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); border: 2px solid rgba(255,255,255,0.8); text-align: center;
         }
 
-        /* Style cho phần Giải thích bên trong Card Back */
         .explanation-box {
-            width: 100%; 
-            font-size: 15px; 
-            color: #444; 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 16px;
-            text-align: left;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            line-height: 1.6;
+            width: 100%; font-size: 15px; color: #444; background: #ffffff; 
+            padding: 20px; border-radius: 16px; text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); line-height: 1.6;
         }
         
-        /* Badge (Nút tag trên flashcard) */
         .category-badge {
             font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background: #f1f3f5;
             color: #868e96; padding: 6px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 20px; display: inline-block;
         }
-        /* Tag trên mặt sau cũng nên nổi bật hơn */
-        .card-back .category-badge {
-            background: #28a745; color: white; box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
-        }
+        .card-back .category-badge { background: #28a745; color: white; box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3); }
 
         /* --- Utils --- */
         .quiz-sidebar {
@@ -8613,12 +8569,17 @@
         const data = state.isVietnamese ? q.vi : q.en;
         document.querySelector('.flashcard').classList.remove('flipped');
         document.getElementById('fc-tag').innerText = q.category || "General";
+        
+        // --- CẬP NHẬT: STYLE CHO MẶT TRƯỚC (CÁC Ô A,B,C,D ĐẸP HƠN) ---
         let contentHtml = `<div>${data.question}</div>`;
         if (data.options) {
             contentHtml += '<ul style="text-align:left; margin-top:20px; padding-left:0; list-style:none; font-size:16px; width:100%;">';
-            data.options.forEach(o => contentHtml += `<li style="margin-bottom:8px; padding:8px; background:#f8f9fa; border-radius:8px; border:1px solid #eee;">${o}</li>`);
+            // Thêm box-shadow và border nhẹ cho từng ô đáp án để nổi bật như trong hình
+            data.options.forEach(o => contentHtml += `<li style="margin-bottom:10px; padding:12px 15px; background:white; border-radius:10px; border:1px solid #e0d4fc; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">${o}</li>`);
             contentHtml += '</ul>';
         }
+        // ------------------------------------------------------------
+
         document.getElementById('fc-content').innerHTML = contentHtml;
         const answerText = Array.isArray(data.answer) ? data.answer.join('\n') : data.answer;
         document.getElementById('fc-answer').innerText = answerText;
